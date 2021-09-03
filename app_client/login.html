@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Page de connexion</title>
+    <script src="./script/JQuery 3.6/jquery.js"></script>
+    <link rel="stylesheet" href="./css/login.css">
+</head>
+<body>
+    <h1>Connexion</h1>
+    <hr>
+    <form class="formulaire-connexion">
+        <div>
+            <label for='user'>Utilisateur : </label>
+            <input type='text' id='user' autocomplete="username" autofocus>
+        </div>
+        <div>
+            <label for='mdp'>Mot de passe : </label>
+            <input type='password' id='mdp' autocomplete="current-password">
+        </div>
+        <button class="btn" id="connecter" onclick='login()' disabled>Connexion</button>
+        <div id='erreurs'></div> 
+    </form>
+    <script>
+
+        const url = 'http://brpetude2.ddns.net:8085';
+
+        function getCookie(nom) {
+            const cookie = document.cookie.split(`${nom}=`);
+            if (cookie.length == 2) return cookie.pop().split(';').shift();
+        }
+        /**
+         * Vérifie si un cookie avec un token valide est déjà stocké, permettant de sauter le process de connexion
+         * 
+         * */
+        if (document.cookie && getCookie('acces')) {
+            const cookie = JSON.parse(getCookie('acces'));
+            $.ajax({
+                url: `${url}/login-cookie`,
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${cookie.token}`
+                }
+            }).done((reponse) => {
+                if (reponse.user) location.href = './index.html';  
+            }).fail(() => {
+
+            });
+        }
+
+        //N'active le bouton connecter que quand les champs utilisateur et mot de passe sont remplis
+        $('.formulaire-connexion input').on('keyup', function () {
+            if ($('#user').val() && $('#mdp').val()) $('#connecter').removeAttr('disabled');
+            else $('#connecter').attr('disabled','');
+        });
+
+       
+
+        //Permet de déclancher l'action de connecter quand l'utilisateur tape sur la touche entrée
+        $('.formulaire-connexion input').on('keypress', (evt) => {
+            const touche = (evt.keyCode ? evt.keyCode : evt.which);
+            if (touche == '13') $('#connecter:enabled').trigger('click');
+        });
+
+        /**
+         * Déclanche l'action de authentification de l'utilisateur avec le serveur,
+         * en cas de réussite, un cookie avec un token d'accès généré par le serveur est stocké
+         * permettant l'accès aux fonction de l'application. Sinon des messages d'erreur s'affichent
+         * */
+        function login() {
+            const login = {
+                user: $('#user').val(),
+                mdp: $('#mdp').val()
+            };
+
+            $('#connecter').html(`Chargement ...`);
+            $('#connecter').attr('disabled','');
+
+            $.ajax({
+                url: `${url}/login`,
+                method: 'POST',
+                dataType: 'json',
+                contentType: 'application/json',
+                data: JSON.stringify(login) 
+            }).done((reponse) => {
+                if (reponse.erreur) {
+                    $('#erreurs').html(`<p>Nom d'utilisateur ou mot de passe incorrects</p>`);
+                    $('#connecter').html(`Connexion`);
+                    $('#connecter').removeAttr('disabled');
+                } else {
+                    let date = new Date();
+                    const cookieExpHours = reponse.cookieExp;
+                    date.setTime(date.getTime() + (cookieExpHours*60*60*1000));
+                    const expire = date.toGMTString();
+                    document.cookie = `acces=${JSON.stringify(reponse)}; expires=${expire}; path=/`;
+                    location.href = './index.html';
+                }         
+            }).fail(() => {
+                $('#connecter').html(`Connexion`);
+                $('#connecter').removeAttr('disabled');
+                $('#erreurs').html('<p>Erreur de communication avec le serveur</p>');
+            });
+        }
+    </script>
+</body>
+</html>

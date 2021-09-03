@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Générateur de rapports - BRP</title>
+    <script src="./script/JQuery 3.6/jquery.js"></script>
+    <script src="./script/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+    <script src="./script/FileSaver.js-master/src/FileSaver.js"></script>
+    <script src="./script/fonctions.js"></script>
+    <script src="./script/com_serveur.js"></script>
+    <link rel="stylesheet" href="./css/home.css" />
+    <link rel="stylesheet" href="./css/editeur.css" />
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="./script/jquery-ui-1.12.1.custom/jquery-ui.min.css">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+</head>
+
+<body>
+    <div id="creer-rapport-modal" class="modal">
+        <div class="modal-content">
+            <div class="ctn-fermer">
+                <span class="modal-fermer">&times;</span>
+            </div>
+            <div class="creer-rapport-modal-inputs">
+                <div class="haut">
+                    <label for="creer-rapport-nom">Nom projet</label>
+                    <input id="creer-rapport-nom" autocomplete="off"/>
+                    <span id="creer-rapport-erreur-char" class="creer-rapport-erreur">Le nom entré contient des caractères invalides</span>
+                    <span id="creer-rapport-erreur-nom-existe" class="creer-rapport-erreur">Le nom du rapport doit être unique</span>
+                </div>
+                <div class="bas">
+                    <label for="creer-rapport-ref">Référence</label>
+                    <input id="creer-rapport-ref" autocomplete="off"/>
+                </div>
+                <div class="bas">
+                    <label for="creer-rapport-client">Client</label>
+                    <input id="creer-rapport-client" autocomplete="off"/>
+                </div>
+            </div>
+            <div class="creer-rapport-modal-boutons">
+                <button id="creer-rapport-annuler">Annuler</button>
+                <button id="creer-rapport-confirmer" disabled>Créer rapport</button>
+            </div>
+            <div class='conteneur-loader masque' id='creer-rapport-loader'>
+                <div class="loader"></div>
+                <span class='texte-chargement'>Chargement ... </span>
+            </div>
+        </div>
+    </div>
+    <div id="supprimer-rapport-modal" class="modal">
+        <div class="modal-content">
+            <div class="ctn-fermer">
+                <span class="modal-fermer">&times;</span>
+            </div>
+            <span>Confirmez-vous la suppression du projet <span id="supprimer-projet-modal-desc-nom-projet"></span> ?</span>
+            <div class="supprimer-rapport-modal-boutons">
+                <button id="supprimer-rapport-annuler">Annuler</button>
+                <button type="button" id="supprimer-rapport-confirmer">Supprimer</button>
+            </div>
+            <div class='conteneur-loader masque' id='supprimer-rapport-loader'>
+                <div class="loader"></div>
+                <span class='texte-chargement'>Chargement ... </span>
+            </div>
+        </div>
+    </div>
+    <div id="sauvegarder-modifications-modal" class="modal">
+        <div class="modal-content">
+            <div class="ctn-fermer">
+                <span class="modal-fermer">&times;</span>
+            </div>
+            <span>Vous avez des modifications non enregistrées. Voulez-vous les enregistrer maintenaint ?</span>
+            <div class="sauvegarder-modifications-modal-boutons">
+                <button id="sauvegarder-modifications-annuler">Ne pas enregistrer</button>
+                <button type="button" id="sauvegarder-modifications-confirmer">Enregistrer</button>
+            </div>
+            <div class='conteneur-loader masque' id='sauvegarder-modifications-loader'>
+                <div class="loader"></div>
+                <span class='texte-chargement'>Chargement ... </span>
+            </div>
+        </div>
+    </div>
+    <div id="dupliquer-rapport-modal" class="modal">
+        <div class="modal-content">
+            <div class="ctn-fermer">
+                <span class="modal-fermer">&times;</span>
+            </div>
+            <label for="dupliquer-rapport-nom">Entrez le nom du nouveau rapport</span>
+            <input id="dupliquer-rapport-nom" autocomplete="off"/>
+            <span id="dupliquer-rapport-erreur-char" class="dupliquer-rapport-erreur">Le nom entré contient des caractères invalides</span>
+            <span id="dupliquer-rapport-erreur-nom-existe" class="dupliquer-rapport-erreur">Le nom du rapport doit être unique</span>
+            <div class="dupliquer-rapport-modal-boutons">
+                <button id="dupliquer-rapport-annuler">Annuler</button>
+                <button id="dupliquer-rapport-confirmer" disabled>Dupliquer</button>
+            </div>
+            <div class='conteneur-loader masque' id='dupliquer-rapport-loader'>
+                <div class="loader"></div>
+                <span class='texte-chargement'>Chargement ... </span>
+            </div>
+        </div>
+    </div>
+    <div id="supprimer-item-bibliotheque-modal" class="modal">
+        <div class="modal-content">
+            <div class="ctn-fermer">
+                <span class="modal-fermer">&times;</span>
+            </div>
+            <span>Confirmez-vous la suppression de <span id="supprimer-item-bibliotheque-titre"></span> ?</span>
+            <div class="supprimer-item-bibliotheque-modal-boutons">
+                <button id="supprimer-item-annuler">Annuler</button>
+                <button type="button" id="supprimer-item-confirmer">Supprimer</button>
+            </div>
+            <div class='conteneur-loader masque' id='supprimer-item-loader'>
+                <div class="loader"></div>
+                <span class='texte-chargement'>Chargement ... </span>
+            </div>
+        </div>
+    </div>
+    <div id="erreur-modal" class="modal">
+        <div class="modal-content">
+            <div class="ctn-fermer">
+                <span class="modal-fermer">&times;</span>
+            </div>
+            <span>Une erreur est survenue : </span>
+            <span id="erreur-modal-description"></span>
+        </div>
+    </div>
+    <div id="menu" class="menu">
+        <div class="cont-btns">
+            <button id="btn-rapports">Rapports</button>
+            <button id="btn-bibliotheque">Bibliothèque</button>
+            <button id="btn-infos-rapport">Infos</button>
+        </div>
+        <div id="contenu-menu">
+            <div id="contenu-menu-chargement">
+                <div class='conteneur-loader'><div class="loader"></div><p class='texte-chargement'>Chargement ... </p></div>
+            </div>
+            <div class="contenu-menu-rapports">
+                <div class="creer-rapport">
+                    <input id="menu-rapport-chercher" placeholder="Rechercher un rapport" title="Recherche d'un rapport"/>
+                    <svg class="creer-rapport-icn" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" height="25" width="25"><title>Créer un nouveau rapport</title><path d="M64 0a64 64 0 1064 64A64.07 64.07 0 0064 0zm0 122a58 58 0 1158-58 58.07 58.07 0 01-58 58z"/><path d="M90 61H67V38a3 3 0 00-6 0v23H38a3 3 0 000 6h23v23a3 3 0 006 0V67h23a3 3 0 000-6z"/></svg>
+                </div>
+                <div class="liste-rapports">
+                </div>
+            </div>
+            <div class="contenu-menu-bibliotheque">
+                <div class="creer-article">
+                   
+                    <svg class="creer-article-icn" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" height="25" width="25"><title>Créer un nouvel article</title><path d="M64 0a64 64 0 1064 64A64.07 64.07 0 0064 0zm0 122a58 58 0 1158-58 58.07 58.07 0 01-58 58z"/><path d="M90 61H67V38a3 3 0 00-6 0v23H38a3 3 0 000 6h23v23a3 3 0 006 0V67h23a3 3 0 000-6z"/></svg>
+                </div>
+                <div id="arborescence-articles">
+                    
+                </div>
+            </div>
+            <div class="contenu-menu-bibliotheque-creer-article">
+                <div class="creer-article-type">
+                    <label for="creer-article-type-groupe">Elément d'arborescence</label>
+                    <input type="radio" name="type" id="creer-article-type-groupe" checked/>
+                    <label for="creer-article-type-article">Article</label>
+                    <input type="radio" name ="type" id="creer-article-type-article"/>
+                </div>
+                <div class="creer-article-conteneur-titre">
+                    <input id="creer-article-titre" placeholder="Titre de l'élément d'arborescence" autocomplete="off"/>
+                </div>
+                <div class="conteneur-editeur-creer-article">
+                    <div class="editeur-creer-article">
+
+                    </div>
+                </div>
+                <div class="creer-article-conteneur-boutons">
+                    <button id="creer-article-annuler">Annuler</button>
+                    <button id="creer-elem-confirmer">Créer élément d'arborescence</button>
+                    <button id="creer-article-confirmer">Créer article</button>
+                    <button id="sauvegarder-modifications-article" style="display: none">Sauvegarder les modifications</button>
+                </div>
+                <div class='creer-article-conteneur-loader' id='creer-article-loader' style="display: none">
+                    <div class="loader"></div>
+                    <span class='texte-chargement'>Chargement ... </span>
+                </div>
+            </div>
+            <div class="contenu-menu-infos">
+                <div class="conteneur-infos" style="display: none;">
+                    <div class="infos-projet-inputs">
+                        <span class="infos-projet-titre">Infos projet</span>
+                        <label for="infos-projet-nom">Nom projet</label>
+                        <input id="infos-projet-nom" autocomplete="off" />
+                        <span id="infos-projet-nom-erreur-char" class="infos-projet-erreur">Le nom entré contient des caractères
+                            invalides</span>
+                        <span id="infos-projet-nom-erreur-nom-existe" class="infos-projet-erreur">Le nom du rapport doit être
+                            unique</span>
+                        <label for="infos-projet-ref">Référence</label>
+                        <input id="infos-projet-ref" autocomplete="off" />
+                        <label for="infos-projet-client">Client</label>
+                        <input id="infos-projet-client" autocomplete="off" />
+                    </div>
+                    <div class="infos-livrable-inputs">
+                        <span class="infos-livrable-titre">Infos livrable</span>
+                        <label for="infos-livrable-nom">Nom livrable</label>
+                        <input id="infos-livrable-nom" autocomplete="off" />
+                        <span id="infos-livrable-nom-erreur-char" class="infos-projet-erreur">Le nom entré contient des caractères
+                            invalides</span>
+                        <label for="infos-livrable-phase">Phase</label>
+                        <input id="infos-livrable-phase" autocomplete="off" />
+                        <label for="infos-livrable-version">Version</label>
+                        <input id="infos-livrable-version" autocomplete="off" />
+                        <label for="infos-livrable-date">Date</label>
+                        <input type="date" min="2018-01-01" id="infos-livrable-date" autocomplete="off" />
+                    </div>
+                    <div class="infos-boutons">
+                        <button id="infos-projet-sauvegarder">Sauvegarder</button>
+                    </div>
+                    <div class='infos-conteneur-loader' id='infos-loader' style="display: none">
+                        <div class="loader"></div>
+                        <span class='texte-chargement'>Chargement ... </span>
+                    </div>
+                </div>
+                <div class="aucun-rapport">
+                    <span>Aucun rapport sélectionné</span>
+                    <span>Utilisez le menu pour ouvrir ou créer un rapport</span>
+                </div>
+            </div>
+            <div class="menu-erreur">
+                <span id="menu-erreur-texte"></span>
+            </div>
+        </div>
+    </div>
+    <div id="menu-editeur-sauvegarde"></div>
+    <div id="menu-editeur-ouverture">
+        <div class='conteneur-loader' id='loader'><div class="loader"></div><p class='texte-chargement'>Chargement ... </p></div>
+    </div>
+    <div id="menu-editeur">
+        <div class="cont-titre-rapport">
+            <input id="titre-rapport" placeholder="Aucun rapport sélectionné" autocomplete="off" disabled/>
+            <span id="titre-erreur-char" class="creer-rapport-erreur">Le nom entré contient des caractères invalides</span>
+            <span id="titre-erreur-nom-existe" class="creer-rapport-erreur">Le nom du rapport doit être unique</span>
+            <span id="titre-erreur-vide" class="creer-rapport-erreur">Veuillez entrer le nom du rapport</span>
+        </div>
+        <div id="editeur-rapport" data-index="0">
+            <div class="aucun-rapport">
+                <span>Aucun rapport sélectionné</span>
+                <span>Utilisez le menu pour ouvrir ou créer un rapport</span>
+            </div>
+            <div class="aucun-titre" title="Ajouter un titre">
+                <svg class="ajouter-titre" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" height="25" width="25"><path d="M64 0a64 64 0 1064 64A64.07 64.07 0 0064 0zm0 122a58 58 0 1158-58 58.07 58.07 0 01-58 58z"/><path d="M90 61H67V38a3 3 0 00-6 0v23H38a3 3 0 000 6h23v23a3 3 0 006 0V67h23a3 3 0 000-6z"/></svg>
+                <span>Ajouter nouveau titre</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TXT_CHARGEMENT = `<div class='conteneur-loader' id='loader'><div class="loader"></div><p class='texte-chargement'>Chargement ... </p></div>`
+        var cookie = undefined;
+        var listeRapportsCourante = {};
+        var quillCreerArticle = undefined;
+        var parentCreerArticle = undefined;
+        
+        var FontAttributor = Quill.import('formats/font');
+        FontAttributor.whitelist = ['arial', 'calibri', 'cambria'];
+        Quill.register(FontAttributor, true);
+
+        var Size = Quill.import('attributors/style/size');
+        Size.whitelist = ['10pt', '11pt', '12pt', '13pt', '14pt', '15pt', '16pt'];
+        Quill.register(Size, true);
+
+        var Delta = Quill.import("delta");
+
+        var quill;
+        const toolbarOptions = [
+            [{
+                'size': ['10pt', '11pt', '12pt', '13pt', '14pt', '15pt', '16pt']
+            }],
+            [{
+                'font': ['arial', 'calibri', 'cambria']
+            }],
+            ['bold', 'italic', 'underline'],
+            [{
+                'list': 'bullet'
+            }],
+            [{
+                'script': 'sub'
+            }, {
+                'script': 'super'
+            }],
+            [{
+                'color': []
+            }, {
+                'background': ['#ffff00', '#00ff00', '#00ffff', '#ff00ff', '#0000ff', '#ff0000', '#008080', '#008000', '#800080', '#808000', '#808080', '#c0c0c0', "#000000", '#ffffff']
+            }],
+            [{
+                'align': []
+            }]
+        ];
+        const quillParams = {
+            theme: "snow",
+            modules: {
+                toolbar: toolbarOptions
+            }
+        };
+
+        
+        //Configurations de connexion et cookie
+        if (getCookie('acces')) {
+            cookie = JSON.parse(getCookie('acces'));
+            if (!cookie) location.href = './login.html';
+        } else location.href='./login.html';
+
+
+
+
+        $("input#menu-rapport-chercher").on("keyup", function () {
+            const texteCourant = $(this).val();
+            if (texteCourant) {
+                $("div.liste-rapport-item").each(function () {
+                    if (!$(this).data("rapp").includes(texteCourant)) $(this).hide();
+                    else $(this).show();
+                });
+            } else $("div.liste-rapport-item").show();
+        });
+
+        $("input#menu-rapport-chercher").on("blur", function () {
+            $(this).val("");
+            $(this).trigger("keyup");
+        });
+
+        $("div.modal span.modal-fermer, button#creer-rapport-annuler, button#supprimer-rapport-annuler, button#dupliquer-rapport-annuler, button#supprimer-item-annuler").on("click", function () {
+            $(this).parents("div.modal").fadeOut(200, () => {
+                $("input#creer-rapport-nom, input#dupliquer-rapport-nom").val("");
+                $("span.creer-rapport-erreur, span.dupliquer-rapport-erreur").hide();
+                $("button#creer-rapport-confirmer, button#dupliquer-rapport-confirmer").attr("disabled","");
+            });
+        });
+
+        $("button#creer-rapport-confirmer").on("click", function () {
+            const btn = this;
+            $(btn).parent().hide();
+            $("div#creer-rapport-loader").removeClass("masque");
+            const nom = $("input#creer-rapport-nom").val();
+            const ref = $("input#creer-rapport-ref").val();
+            const client = $("input#creer-rapport-client").val();
+            const rapp = {
+                nom: nom,
+                ref: ref,
+                client: client,
+                infosLivrable: {
+                    nom: "",
+                    phase: "",
+                    version: "",
+                    date: ""
+                },
+                titres: []
+            };
+            creerRapport(rapp).then(() => {
+                listerRapports();
+                $("div#creer-rapport-modal").fadeOut(200, () => {
+                    $("div#creer-rapport-loader").addClass("masque");
+                    $(btn).parent().show();
+                });
+            }).catch((err) => {
+                $("span#erreur-modal-description")
+                console.log(err);
+            });
+        });
+
+        $("button#dupliquer-rapport-confirmer").on("click", function () {
+            $("div#dupliquer-rapport-modal-boutons").hide();
+            $("div#dupliquer-rapport-loader").show();
+            const nomRapportCopie = $("input#dupliquer-rapport-nom").val();
+            dupliquerRapport(nomRapportSource, nomRapportCopie).then(() => {
+                $("div#dupliquer-rapport-modal-boutons").show();
+                $("div#dupliquer-rapport-loader").hide();
+                $("div#dupliquer-rapport-modal span.modal-fermer").trigger("click");
+                listerRapports();
+            });
+        });
+        
+        $("div#menu-editeur div.aucun-titre").hide();
+
+        $("div.aucun-titre").on("click", function() {
+            $(this).hide();
+            creerTitre(1);
+        });
+
+        function verifierNomRapportEvt(idCible) {
+            $(`input#creer-rapport-nom`).off();
+            $("input#creer-rapport-nom").on("keyup", function () {
+                const mauvaisCaracteres = /[\\/:"*?<>|.]+/;
+                const valeurCourante = $(this).val();
+                $("button#creer-rapport-confirmer").attr("disabled", "");
+                $(this).siblings("span.creer-rapport-erreur").hide();
+                if (mauvaisCaracteres.test(valeurCourante)) $(this).siblings("span#creer-rapport-erreur-char").show();
+                else if (listeRapportsCourante.rapports.includes(valeurCourante)) $(this).siblings("span#creer-rapport-erreur-nom-existe").show();
+                else if (valeurCourante != "") $("button#creer-rapport-confirmer").removeAttr("disabled");
+            });
+        }
+
+        $("div.contenu-menu-rapports div.creer-rapport svg.creer-rapport-icn").on("click", function () {
+            $("html").css("cursor", "wait");
+            chargerRapports().then((valResolue) => {
+                $("html").css("cursor","default");
+                $("div#creer-rapport-modal").fadeIn(200);
+                listeRapportsCourante = valResolue;
+                verifierNomRapportEvt();
+            }).catch((err) => {
+                afficherErreurModal(err.message)
+                console.log(err);
+            });
+        });
+
+        
+
+        $("svg.ajouter-titre").on("click", function() {
+            const dpdwContenu = $(this).parent().next();
+            if (dpdwContenu.hasClass("masque")) dpdwContenu.removeClass("masque");
+            else dpdwContenu.addClass("masque");
+        });
+
+        $(document).on("click", function(event) {
+            if (!$(event.target).hasClass("ajouter-titre")) $("div.dpdw-contenu").addClass("masque");
+        });
+
+        $("div.dpdw-contenu a").on("click", function() {
+            const titre = $(this).parent().parent().parent();
+            var index = 0;
+            if (titre.hasClass("titre-1")) index = 1;
+            else if (titre.hasClass("titre-2")) index = 2;
+            else if (titre.hasClass("titre-3")) index = 3;
+            else if (titre.hasClass("titre-4")) index = 4;
+            creerTitre(index, titre);
+        });
+
+        $("#contenu-menu").children().hide();
+
+        $("#btn-rapports").on("click", function() {
+            $("div.cont-btns button:disabled").removeAttr("disabled");
+            $(this).attr("disabled", "");
+            $("#contenu-menu").children().hide();
+            $("#contenu-menu .contenu-menu-rapports").show();
+            $("div#contenu-menu-chargement").css("display", "flex");
+
+            $("div#rapports-loader").show();
+
+            let rappSelectionne = undefined;
+            if ($("div.liste-rapport-item.selectionne").length > 0) {
+                rappSelectionne = $("div.liste-rapport-item.selectionne").data("rapp");
+            }
+            listerRapports(rappSelectionne).then((reponse) => {
+                listeRapportsCourante = reponse;
+            }).catch((err) => {
+                afficherErreurModal(err);
+            }).finally(() => {
+                $("div#contenu-menu-chargement").hide();
+            });
+            
+        });
+
+        $("#btn-bibliotheque").on("click", function() {
+            $("div.cont-btns button:disabled").removeAttr("disabled");
+            $(this).attr("disabled", "");
+            $("#contenu-menu").children().hide();
+            $("#contenu-menu .contenu-menu-bibliotheque").show();
+            $("div#contenu-menu-chargement").css("display", "flex");
+            genererHtmlBibliotheque().catch((err) => {
+                afficherErreurModal(err);
+            }).finally(() => {
+                $("div#contenu-menu-chargement").hide();
+            })
+        });
+
+        $("div.contenu-menu-bibliotheque svg.creer-article-icn").on("click", function () {
+            $("input#creer-article-type-groupe").trigger("click");
+            $("#contenu-menu").children().hide();
+            $("input#creer-article-titre").val("");
+            $("#contenu-menu .contenu-menu-bibliotheque-creer-article").show();
+            parentCreerArticle = undefined;
+        });
+
+        $("button#creer-article-annuler").on("click", function() {
+            $("#contenu-menu").children().hide();
+            $("input#creer-article-type-groupe").removeAttr("disabled");
+            $("button#sauvegarder-modifications-article").hide();
+            $("#contenu-menu .contenu-menu-bibliotheque").show();
+        });
+
+        $("input#creer-article-type-article").on("click", function () {
+            $("input#creer-article-titre").attr("placeholder", "Titre de l'article");
+            $("div.contenu-menu-bibliotheque-creer-article div.conteneur-editeur-creer-article").html(`<div class="editeur-creer-article"></div>`);
+            $("button#creer-elem-confirmer").hide();
+            $("button#creer-article-confirmer").show();
+            let conteneurEditeur = $("div.contenu-menu-bibliotheque-creer-article div.editeur-creer-article")[0];
+            quillCreerArticle = new Quill(conteneurEditeur, quillParams);
+            conteneurEditeur.__quill = quillCreerArticle;
+        });
+
+        $("input#creer-article-type-groupe").on("click", function () {
+            $("input#creer-article-titre").attr("placeholder", "Titre de l'élément d'arborescence");
+            $("div.contenu-menu-bibliotheque-creer-article div.conteneur-editeur-creer-article").html(`<div class="editeur-creer-article"></div>`);
+            $("button#creer-article-confirmer").hide();
+            $("button#creer-elem-confirmer").show();
+        });
+
+        $("button#creer-article-confirmer").on("click", function () {
+            const titreArticle = $("input#creer-article-titre").val();
+            const contenuArticle = JSON.stringify(quillCreerArticle.getContents());
+            creerArticle(parentCreerArticle, "article", titreArticle, contenuArticle).then(() => {
+                $("#contenu-menu").children().hide();
+                $("#contenu-menu .contenu-menu-bibliotheque").show();
+            }).catch((err) => console.log(err));
+        });
+
+        $("button#creer-elem-confirmer").on("click", function () {
+            const titreArticle = $("input#creer-article-titre").val();
+            
+            creerArticle(parentCreerArticle, "groupe", titreArticle).then(() => {
+                $("#contenu-menu").children().hide();
+                $("#contenu-menu .contenu-menu-bibliotheque").show();
+            }).catch((err) => console.log(err));
+        });
+
+        $("#btn-infos-rapport").on("click", function() {
+            $("div.cont-btns button:disabled").removeAttr("disabled");
+            $(this).attr("disabled", "");
+            $("#contenu-menu").children().hide();
+            $("#contenu-menu .contenu-menu-infos").show();
+        });
+
+    
+        $("input#infos-projet-nom, input#titre-rapport").on("focus", function() {
+            const rappSelectionne = $("div.liste-rapport-item.selectionne").data("rapp");
+            const autresRapports = listeRapportsCourante.rapports.filter((val) => {return val != rappSelectionne;});
+            $(this).data("autres-rapports",JSON.stringify(autresRapports));
+        });
+
+        $("input#infos-projet-nom").on("keyup", function () {
+            const mauvaisCaracteres = /[\\/:"*?<>|.]+/;
+            const valeurCourante = $(this).val();
+            const autresRapports = JSON.parse($(this).data("autres-rapports"));
+
+            $("button#infos-projet-sauvegarder").attr("disabled", "");
+            $(this).siblings("span.infos-projet-erreur").hide();
+            if (mauvaisCaracteres.test(valeurCourante)) $(this).siblings("span#infos-projet-nom-erreur-char").show();
+            else if (autresRapports.includes(valeurCourante)) $(this).siblings("span#infos-projet-nom-erreur-nom-existe").show();
+            else if (valeurCourante != "") $("button#infos-projet-sauvegarder").removeAttr("disabled");
+        });
+
+        $("button#infos-projet-sauvegarder").on("click", function () {
+            const ancienNom = $("div.liste-rapport-item.selectionne").data("rapp");
+            const nouveauNom = $("input#infos-projet-nom").val();
+            console.log(ancienNom)
+            console.log(nouveauNom)
+            $("div#contenu-menu-chargement").css("display", "flex");
+            if (ancienNom != nouveauNom) {
+                modifierNomRapport(ancienNom, nouveauNom).then(() => {
+                    sauvegarderRapport().then(() => {
+                        listerRapports(nouveauNom).catch((err) => afficherErreurModal(err.message));
+                    }).catch((err) => {
+                        afficherErreurModal(err.message);
+                    });
+                }).catch((err) => {
+                    afficherErreurModal(err.message);
+                }).finally(() => {
+                    $("div#contenu-menu-chargement").hide();
+                })
+            } else {
+                sauvegarderRapport().then(() => {
+                    listerRapports(nouveauNom).catch(err => afficherErreurModal(err.message));
+                }).catch((err) => {
+                    afficherErreurModal(err.message);
+                }).finally(() => {
+                    $("div#contenu-menu-chargement").hide();
+                })
+            }
+            
+        });
+
+        $("input#titre-rapport").on("keyup", function () {
+            const mauvaisCaracteres = /[\\/:"*?<>|.]+/;
+            const valeurCourante = $(this).val();
+            const autresRapports = JSON.parse($(this).data("autres-rapports"));
+
+
+            if (mauvaisCaracteres.test(valeurCourante)) {
+                $(this).addClass("invalide");
+                $("span#titre-erreur-char").show();
+            }
+            else if (valeurCourante == "") {
+                $(this).addClass("invalide");
+                $("span#titre-erreur-vide").show();
+            } 
+            else if (autresRapports.includes(valeurCourante)) {
+                $(this).addClass("invalide");
+                $("span#titre-erreur-nom-existe").show();
+            }
+            else {
+                $(this).removeClass("invalide");
+                $(this).siblings("span.creer-rapport-erreur").hide();
+            }
+        });
+
+        $("input#titre-rapport").on("blur", function() {
+            if ($(this).hasClass("invalide")) {
+                const ancienTitre = $("div.liste-rapport-item.selectionne").data("rapp");
+                $(this).val(ancienTitre);
+                $(this).removeClass("invalide");
+                $(this).siblings("span.creer-rapport-erreur").hide();
+            } else {
+                const nouveauTitre = $(this).val();
+                modifierNomRapport($("div.liste-rapport-item.selectionne").data("rapp"), $(this).val()).then(() => {
+                    listerRapports().then(() => {
+                        $(`div.liste-rapport-item[data-rapp="${nouveauTitre}"]`).addClass("selectionne");
+                    }).catch((err) => {
+
+                    });
+                }).catch((err) => {
+
+                });
+            }
+        });
+
+    </script>
+</body>
+
+</html>

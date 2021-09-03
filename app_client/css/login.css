@@ -1,0 +1,67 @@
+:root {
+    --dark-grey: rgb(82, 82, 74);
+    --blue-btn-hover: white;
+    --delete-btn-red: rgba(255, 0, 0, 0.75);
+}
+
+
+h1 {
+    text-align: center;
+}
+
+h1, button, label, p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.formulaire-connexion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.formulaire-connexion div {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.formulaire-connexion input {
+    margin: 10px 0px;
+    width: 292px;
+    margin-right: 110px;
+    height: 20px;
+    border: solid;
+    border-radius: 5px;
+    border-width: 1px;
+}
+
+.formulaire-connexion button {
+    margin: 10px 0px;
+    width: 150px;
+}
+
+.formulaire-connexion label {
+    width: 100px;
+    text-align: right;
+    margin-right: 10px;
+}
+
+.formulaire-connexion button {
+    background-color: white;
+    border: solid;
+    border-width: 1px;
+    border-radius: 5px;
+    font-size: 15px;
+    padding: 5px;
+    margin: 15px 5px;
+    width: 200px;
+    height: 30px;
+    border-color: var(--dark-grey);
+}
+
+.formulaire-connexion button:hover:enabled{
+    cursor: pointer;
+    font-weight: bold;
+}

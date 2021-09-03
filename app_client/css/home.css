@@ -1,0 +1,719 @@
+:root {
+    --blue: #1266F1;
+    --blue-back: #1268f113;
+    --dark-grey: rgb(82, 82, 74);
+    --blue-btn-hover: white;
+    --delete-btn-red: rgba(255, 0, 0, 0.75);
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+h1, button, select, p, label, td, th, li, input, span, a {
+    font-family: var(--font-family)
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+}
+
+body {
+    display: flex;
+    flex-direction: row;
+}
+
+input {
+    outline: none;
+}
+
+input:focus {
+    box-shadow: 0 0 1px 1px grey;
+}
+
+.loader {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid;
+    border-top-color: var(--dark-grey);
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
+    animation: spin 2s linear infinite;
+    margin: 0px 10px;
+}
+
+.conteneur-loader {
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+}
+
+.conteneur-loader.masque {
+    display: none;
+}
+
+span.texte-chargement {
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+div.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0, 0, 0);
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+div.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 0px 10px 15px 10px;
+    border: 1px solid #888;
+    width: 35%;
+    display: flex;
+    flex-direction: column;
+}
+
+div.modal-content label {
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    width: 90%;
+}
+
+div.creer-rapport-modal-inputs {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    flex-grow: 0;
+}
+
+
+div.creer-rapport-modal-inputs > div.bas {
+    display: flex;
+    flex-direction: column;
+    width: 47%;
+    margin-top: 10px;
+}
+
+div.creer-rapport-modal-inputs > div.haut {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+div.creer-rapport-modal-inputs > div > label {
+    align-self: flex-start;
+}
+
+input#creer-rapport-nom, input#dupliquer-rapport-nom {
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    border-width: 1px;
+    margin-top: 10px;
+    align-self: center;
+    text-align: center;
+    width: 98%;
+}
+
+input#creer-rapport-ref, input#creer-rapport-client {
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    border-width: 1px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+span.creer-rapport-erreur, span.dupliquer-rapport-erreur,
+span.infos-projet-erreur {
+    display: none;
+    color: red;
+    font-size: 13px;
+    margin: 3px 0px;
+}
+
+div.creer-rapport-modal-boutons,
+div.dupliquer-rapport-modal-boutons {
+    align-self: center;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+div.creer-rapport-modal-boutons button,
+div.dupliquer-rapport-modal-boutons button {
+    width: 47%;
+    height: 30px;
+    border: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    font-size: 16px;
+    background-color: #fff;
+}
+
+
+div.creer-rapport-modal-boutons button:enabled:hover, div.dupliquer-rapport-modal-boutons button:enabled:hover  {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+div.modal-content div.ctn-fermer {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+span.modal-fermer {
+    color: #aaa;
+    font-size: 26px;
+    font-weight: bold;
+    text-align: end;
+}
+
+span.modal-fermer:hover, span.modal-fermer:focus {
+    color: var(--delete-btn-red);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+div.supprimer-rapport-modal-boutons,
+div.supprimer-item-bibliotheque-modal-boutons {
+    align-self: center;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+div.supprimer-rapport-modal-boutons button,
+div.sauvegarder-modifications-modal-boutons button,
+div.supprimer-item-bibliotheque-modal-boutons button {
+    width: 48%;
+    height: 30px;
+    border: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    font-size: 16px;
+    background-color: #fff;
+}
+
+div.supprimer-rapport-modal-boutons button:enabled:hover,
+div.sauvegarder-modifications-modal-boutons button:enabled:hover,
+div.supprimer-item-bibliotheque-modal-boutons button:hover {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+div#sauvegarder-modifications-modal span {
+    margin-bottom: 10px;
+}
+
+button#supprimer-rapport-confirmer:enabled:hover,
+button#supprimer-item-confirmer:hover {
+    background-color: var(--delete-btn-red);
+}
+
+span#supprimer-projet-modal-desc-nom-projet,
+span#supprimer-item-bibliotheque-titre {
+    font-weight: bold;
+}
+
+div#erreur-modal div.modal-content > span{
+    text-align: center;
+}
+
+div#menu {
+    display: flex;
+    flex-direction: column;
+    width: 35%;
+    border-right: solid;
+    border-width: 2px;
+}
+
+div#contenu-menu {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+div.cont-btns {
+    margin: 5px 8px 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+div.cont-btns {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
+
+div.cont-btns button {
+    width: 100%;
+    background-color: white;
+    border: none;
+    border-bottom: solid;
+    border-width: 2px;
+    border-color: black;
+    color: black;
+    font-size: 18px;
+    padding: 10px 0px;
+}
+
+div.cont-btns button:enabled:hover {
+    border: solid;
+    border-bottom: none;
+    border-width: 2px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    cursor: pointer;
+}
+
+div.cont-btns button:disabled {
+    color: var(--dark-grey);
+    border: solid black;
+    border-width: 2px;
+    border-bottom: none;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+div#menu-editeur {
+    width: 65%;
+    display: flex;
+    flex-direction: column;
+}
+
+div#menu-editeur-sauvegarde, div#menu-editeur-ouverture {
+    width: 65%;
+    z-index: 10;
+    position: absolute;
+    display: none;
+    height: 100%;
+    top: 0;
+    left: 35%;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+div#contenu-menu-chargement {
+    width: 35%;
+    z-index: 10;
+    position: absolute;
+    height: 100%;
+    top: 0px;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+div#contenu-menu-chargement:hover {
+    cursor: wait;
+}
+
+div#menu-editeur-sauvegarde:hover, div#menu-editeur-ouverture:hover {
+    cursor: wait;
+}
+
+div#menu-editeur-ouverture {
+    justify-content: center;
+}
+
+div#menu-editeur-ouverture div.loader {
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid;
+    border-top-color: var(--dark-grey);
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    margin: 0px 10px;
+    animation: spin 2s linear infinite;
+}
+
+div#menu-editeur-ouverture p.texte-chargement {
+    font-size: 22px;
+}
+
+div#menu-editeur-sauvegarde:hover {
+    cursor: wait;
+}
+
+div.cont-titre-rapport {
+    display: flex;
+    justify-content: center;
+    border-bottom: solid;
+    border-width: 2px;
+    margin: 5px 8px 20px;
+    height: 58px;
+    flex-shrink: 0;
+    flex-direction: column;
+}
+
+span#titre-erreur-char, span#titre-erreur-nom-existe, span#titre-erreur-vide {
+    text-align: center;
+    width: 100%;
+}
+
+div.cont-titre-rapport input#titre-rapport {
+    font-size: 25px;
+    width: 100%;
+    text-align: center;
+    border: none;
+    outline: none;
+}
+
+div.cont-titre-rapport input#titre-rapport.invalide {
+    color: red;
+}
+
+div.cont-titre-rapport input#titre-rapport:focus::placeholder {
+    color: transparent;
+}
+
+div.cont-titre-rapport input#titre-rapport:disabled {
+    background-color: #fff;
+}
+
+div.creer-rapport, div.creer-article {
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    margin-left: 10px;
+    align-items: center;
+}
+
+div.creer-rapport .creer-rapport-icn, div.creer-article .creer-article-icn {
+    margin: 0px auto;
+}
+
+div.creer-rapport svg.creer-rapport-icn:hover, div.creer-article .creer-article-icn:hover {
+    fill: var(--blue);
+    cursor: pointer;
+}
+
+input#menu-rapport-chercher, input#menu-bibliotheque-chercher {
+    width: 85%;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    border-width: 1px;
+    margin: 1px;
+}
+
+div.liste-rapports {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+    padding-bottom: 30px;
+}
+
+div.liste-rapport-item {
+    display: flex;
+    flex-direction: row;
+    padding: 15px 5px;
+    border-radius: 5px;
+    margin: 0px 5px;
+    align-content: start;
+    height: 25px;
+}
+
+div.liste-rapport-item.selectionne {
+    background-color: rgba(221, 221, 221, 0.6);
+}
+
+div.liste-rapport-item:hover {
+    cursor: pointer;
+    background-color: #ddd;
+}
+
+div.liste-rapport-item svg.doc-icn {
+    margin-right: 10px;
+}
+
+div.liste-rapport-item svg.save-icn {
+    margin-left: auto;
+    visibility: hidden;
+}
+
+div.liste-rapport-item div.conteneur-loader {
+    margin-left: auto;
+    display: none;
+}
+
+div.liste-rapport-item svg.export-icn {
+    margin-left: 10px;
+}
+
+div.liste-rapport-item svg.copy-icn {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+div.liste-rapport-item svg.copy-icn:hover, div.liste-rapport-item svg.save-icn:hover, div.liste-rapport-item svg.export-icn:hover g {
+    fill: #1266F1;
+}
+
+div.liste-rapport-item svg {
+    flex-shrink: 0;
+}
+
+div.liste-rapport-item svg.trash-icn:hover {
+    cursor: pointer;
+    fill: red;
+}
+
+div.aucun-rapport, div.menu-erreur {
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    background-color: rgba(255, 169, 169, 0.25);
+    margin: 0px auto;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: default;
+}
+
+div.contenu-menu-bibliotheque div#arborescence-article {
+    margin-top: 20px;
+    padding: 0px 10px;
+}
+
+div.accordion > div.ui-accordion-content {
+    padding: 5px 0px 5px 25px;
+}
+
+div.liste-articles {
+    display: flex;
+    flex-direction: column;
+}
+
+div.accordion div.ui-widget-content {
+    border: none;
+}
+
+div#arborescence-articles {
+    margin: 10px 5px;
+}
+
+div#arborescence-articles h3.ui-accordion-header {
+    background: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+h3.ui-accordion-header:hover {
+    background: #ddd !important;
+}
+
+h3.ui-accordion-header.ui-accordion-header-active {
+    border: 1px solid black;
+    background: #f0f0f0 !important;
+    font-weight: normal;
+    color: #454545;
+}
+
+
+h3.ui-accordion-header.ui-accordion-header-active span.ui-accordion-header-icon {
+    background-image: url("./script/jquery-ui-1.12.1.custom/images/ui-icons_444444_256x240.png");
+}
+
+div.conteneur-item-bibliotheque {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: .5em .5em .5em .7em;
+    border-radius: 5px;
+
+}
+
+div.conteneur-item-bibliotheque span {
+    color: #454545;
+}
+
+div.conteneur-item-bibliotheque > span.item-bibliotheque-bullet {
+    font-size: 20px;
+    margin: 0px 4px;
+}
+
+div.conteneur-item-bibliotheque:hover {
+    background: #ddd;
+    cursor: pointer;
+}
+
+
+div.conteneur-item-bibliotheque > svg.supprimer-article {
+    margin-left: auto;
+}
+
+
+div.conteneur-item-bibliotheque > svg.supprimer-article:hover {
+    fill: var(--delete-btn-red);
+}
+
+div.accordion h3.ui-accordion-header {
+    font-family: var(--font-family);
+}
+
+
+div.accordion h3.ui-accordion-header span.item-bibliotheque-boutons {
+    float: right;
+    display: none;
+}
+
+div.accordion h3.ui-accordion-header-active span.item-bibliotheque-boutons {
+    float: right;
+    display: flex;
+}
+
+div.accordion h3 span.item-bibliotheque-boutons svg.creer-article-icn {
+    margin-right: 10px;
+}
+
+div.accordion h3 span.item-bibliotheque-boutons svg.creer-article-icn:hover {
+    fill: var(--blue);
+}
+
+div.accordion h3 span.item-bibliotheque-boutons svg.supprimer-item-arborescence:hover {
+    fill: var(--delete-btn-red);
+}
+
+div.accordion h3 input.item-arborescence-rennomage {
+    border-radius: 5px;
+    border-width: 1px;
+    height: 20px;
+    width: 83%;
+    display: none;
+}
+
+
+div.contenu-menu-bibliotheque-creer-article div.conteneur-editeur-creer-article {
+    margin: 10px;
+}
+
+div.creer-article-conteneur-titre {
+    display: flex;
+}
+
+input#creer-article-titre {
+    margin: 10px;
+    width: 100%;
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    border-width: 1px;
+}
+
+div.contenu-menu-bibliotheque-creer-article div.creer-article-conteneur-boutons {
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 10px;
+}
+
+div.contenu-menu-bibliotheque-creer-article div.creer-article-conteneur-boutons button {
+    width: 48%;
+    height: 50px;
+    border: solid;
+    border-radius: 5px;
+    border-width: 1px;
+    font-size: 16px;
+    background-color: #fff;
+}
+
+div.contenu-menu-bibliotheque-creer-article div.creer-article-conteneur-boutons button:hover  {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+div.contenu-menu-bibliotheque-creer-article div.creer-article-type {
+    display: flex;
+    align-items: center;
+    margin: 20px 10px;
+}
+
+div.contenu-menu-bibliotheque-creer-article label[for="creer-article-type-article"] {
+    margin-left: auto;
+}
+
+div.contenu-menu-infos {
+    margin: 10px;
+}
+
+div.infos-projet-inputs,
+div.infos-livrable-inputs,
+div.infos-boutons {
+    display: flex;
+    flex-direction: column;
+}
+
+div.infos-projet-inputs span.infos-projet-titre,
+div.infos-livrable-inputs span.infos-livrable-titre {
+    font-size: 20px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: solid;
+    border-width: 2px;
+}
+
+div.infos-livrable-inputs span.infos-livrable-titre {
+    margin-top: 30px;
+}
+
+div.infos-projet-inputs input,
+div.infos-livrable-inputs input {
+    font-size: 16px;
+    padding: 5px;
+    border-radius: 5px;
+    border-width: 1px;
+    width: 95%;
+    margin: 5px auto 0px auto;
+}
+
+div.contenu-menu-infos label {
+    width: 97%;
+    margin: 0px auto;
+}
+
+span.infos-projet-erreur {
+    width: 77%;
+    margin: 0px auto;
+}
+
+div.infos-boutons {
+    margin-top: 25px;
+    border-top: solid 2px;
+    padding-top: 10px;
+}
+
+button#infos-projet-sauvegarder {
+    width: 200px;
+    height: 30px;
+    border: solid 1px;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #fff;
+    align-self: center;
+}
+
+button#infos-projet-sauvegarder:enabled:hover {
+    font-weight: bold;
+    cursor: pointer;
+}

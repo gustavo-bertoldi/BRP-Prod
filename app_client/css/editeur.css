@@ -1,0 +1,294 @@
+:root {
+    --blue: #1266F1;
+    --blue-back: #1268f113;
+    --dark-grey: rgb(82, 82, 74);
+    --blue-btn-hover: white;
+    --delete-btn-red: rgba(255, 0, 0, 0.75);
+    --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+div.titre-contenu {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    flex-direction: row;
+    margin-bottom: 20px;
+    flex-basis: 100%;
+}
+
+div.titre-1 {
+    margin-left: 8px;
+}
+
+div.titre-1 span.index {
+    font-size: 20px;
+}
+
+div.titre-1 input.titre-input {
+    width: 80%;
+    height: 30px;
+    font-size: 20px;
+    border-radius: 5px;
+    border-width: 2px;
+    padding: 3px;
+    border: none;
+    outline-width: 1px;
+}
+
+div.texte {
+    display: flex;
+    flex-direction: column;
+    min-height: 50px;
+    width: 100%;
+    margin: 8px;
+}
+
+.has-hover:hover {
+    cursor: pointer;
+}
+
+div.btn-supprimer-titre {
+    margin-right: 10px;
+}
+
+
+div.btn-supprimer-titre:hover {
+    fill: red;
+    cursor: pointer;
+}
+
+div.btn-ajouter-titre:hover,
+div.aucun-titre:hover {
+    fill: var(--blue);
+    cursor: pointer;
+}
+
+div#editeur-rapport div.aucun-rapport.masque  {
+    display: none;
+}
+
+div.ajouter-titre-dpdw {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 10px;
+}
+
+div.dpdw-contenu {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 100px;
+    top: 35px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+div.dpdw-contenu.masque {
+    display: none;
+}
+
+div.dpdw-contenu a {
+    padding: 5px;
+    text-align: center;
+}
+
+div.dpdw-contenu a:hover {
+    background-color: #ddd;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+div.ql-toolbar span.btn-sauvegarder-texte {
+    text-align: center;
+    color: #444;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 22px;
+    float: right;
+    margin-right: 15px;
+}
+
+div.ql-toolbar span.btn-sauvegarder-texte:hover {
+    cursor: pointer;
+    color: #06c;
+}
+
+div.div-sauvegarde-texte {
+    width: 100%;
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 10px 8px;
+}
+
+div.titre-2 {
+    margin-left: 15px;
+}
+
+div.titre-2 span.index {
+    font-size: 18px;
+}
+
+div.titre-2 input.titre-input {
+    width: 80%;
+    height: 28px;
+    font-size: 18px;
+    border-radius: 5px;
+    border-width: 2px;
+    padding: 3px;
+    border: none;
+    outline-width: 1px;
+}
+
+div.titre-3 {
+    margin-left: 22px;
+}
+
+div.titre-3 span.index {
+    font-size: 16px;
+}
+
+div.titre-3 input.titre-input {
+    width: 80%;
+    height: 26px;
+    font-size: 16px;
+    border-radius: 5px;
+    border-width: 2px;
+    padding: 3px;
+    border: none;
+    outline-width: 1px;
+}
+
+div.titre-4 {
+    margin-left: 29px;
+}
+
+div.titre-4 span.index {
+    font-size: 14px;
+}
+
+div.titre-4 input.titre-input {
+    width: 80%;
+    height: 24px;
+    font-size: 14px;
+    border-radius: 5px;
+    border-width: 2px;
+    padding: 3px;
+    border: none;
+    outline-width: 1px;
+}
+
+div#editeur-rapport {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 200px;
+    padding-top: 5px;
+}
+
+div#editeur-rapport div.aucun-titre {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+/* Set default font-family */
+
+#container {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14pt;
+    height: 375px;
+}
+
+#container #toolbar-container.ql-toolbar {
+    padding: 10px;
+}
+
+.ql-snow .ql-picker.ql-font,
+.ql-bubble .ql-picker.ql-font {
+    width: 130px;
+}
+
+
+/* Set dropdown font-families */
+.ql-font.ql-picker .ql-picker-options span[data-value="arial"]::before,
+.ql-font.ql-picker span.ql-picker-label[data-value="arial"]::before  {
+    content: 'Arial';
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.ql-font.ql-picker .ql-picker-options span[data-value="calibri"]::before,
+.ql-font.ql-picker span.ql-picker-label[data-value="calibri"]::before  {
+    content: 'Calibri';
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.ql-font.ql-picker .ql-picker-options span[data-value="cambria"]::before,
+.ql-font.ql-picker span.ql-picker-label[data-value="cambria"]::before {
+    content: 'Cambria';
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+.ql-font-arial {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.ql-font-calibri {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+.ql-font-cambria {
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+
+span.ql-size.ql-picker {
+    width: 50px !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="10pt"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="10pt"]::before {
+    content: '10';
+    font-size: 10pt !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="11pt"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="11pt"]::before {
+    content: '11';
+    font-size: 11pt !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="12pt"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="12pt"]::before {
+    content: '12';
+    font-size: 12pt !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="13pt"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="13pt"]::before {
+    content: '13';
+    font-size: 13pt !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="14pt"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="14pt"]::before {
+    content: '14';
+    font-size: 14pt !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="15pt"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="15pt"]::before {
+    content: '15';
+    font-size: 15pt !important;
+}
+
+.ql-snow .ql-picker.ql-size .ql-picker-item[data-value="16pt"]::before,
+.ql-snow .ql-picker.ql-size .ql-picker-label[data-value="16pt"]::before {
+    content: '16';
+    font-size: 16pt !important;
+}
