@@ -32,17 +32,20 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 
-
+/**
+ * Crée les dossier utilisés par l'application s'ils n'existent déjà
+ */
 fs.mkdir(cheminRapports, (err) => {
     if (err && err.code != "EEXIST") console.log(err);
 });
-
 
 fs.mkdir(cheminIndices, (err) => {
     if (err && err.code != "EEXIST") console.log(err);
 });
 
-
+fs.mkdir(cheminFichiersTemp, (err) => {
+    if (err && err.code != "EEXIST") console.log(err);
+});
 
 /**
  * Signature d'un token avec le nom d'utilisateur. Expire dans 12 heures
@@ -84,6 +87,10 @@ function authentifierToken(req, res, next) {
  */
 app.listen(port, () => console.log(`Serveur initialisé. Ecoute sur le port ${port} ... `));
 
+/**
+ * Lit le fichier local contenant les données des utilisateurs
+ * @returns Promesse résolue si les utilisateur ont pu être récupérés 
+ */
 function getUtilisateurs() {
     return new Promise((resolve, reject) => {
         fs.readFile(cheminUtilisateurs, "utf8", (err, donnees) => {
@@ -98,6 +105,12 @@ function getUtilisateurs() {
     });
 }
 
+/**
+ * Prend en paramètre une paire nom d'utilisateur et mot de passe pour authentifier le login
+ * @param {String} user 
+ * @param {String} mdp 
+ * @returns Promesse résolue si l'utilisateur a été authentifié, rejetée sinon
+ */
 function authentifierUtilisateur(user, mdp) {
     return new Promise((resolve, reject) => {
         getUtilisateurs().then((utilisateurs) => {
@@ -115,6 +128,10 @@ function authentifierUtilisateur(user, mdp) {
     });
 }
 
+/**
+ * Lit les fichiers locaux d'indice
+ * @returns Promesse résolue si les données on été récupérées, rejetée sinon
+ */
 function getIndices() {
     return new Promise((resolve, reject) => {
         fs.readFile(`${cheminIndices}${nomFicIndices}`, "utf8", (err, donnees) => {
@@ -137,6 +154,12 @@ function getIndices() {
     });
 }
 
+/**
+ * Prend en paramètre un objet contenant les données d'indice mis-à-jour et sauvegarde les données dans
+ * les fichiers locaux
+ * @param {Object} indices Objet contenant les indices
+ * @returns Promesse résolue si les indices ont été sauvegardés, rejetée sinon
+ */
 function sauvegarderIndices(indices) {
     return new Promise((resolve, reject) => {
         fs.writeFile(`${cheminIndices}${nomFicIndices}`, JSON.stringify(indices), (err) => {
@@ -153,6 +176,11 @@ function sauvegarderIndices(indices) {
     });
 }
 
+/**
+ * Ajoute le rapport dont le nom est passé en paramètre aux indices
+ * @param {String} nomRapport Nom du rapport à ajouter aux indices
+ * @returns Promesse résolue si le rapport a été ajouté, rejetée sinon
+ */
 function ajouterIndice(nomRapport) {
     return new Promise((resolve, reject) => {
         getIndices().then((indices) => {
@@ -170,6 +198,11 @@ function ajouterIndice(nomRapport) {
     });
 }
 
+/**
+ * Supprime le rapport dont le nom est passé en paramètre des indices
+ * @param {String} nomRapport Nom du rapport à supprimer des indices
+ * @returns Promesse résolue si la suppression a réussi, rejetée sinon
+ */
 function supprimerIndice(nomRapport) {
     return new Promise((resolve, reject) => {
         getIndices().then((indices) => {
@@ -185,6 +218,11 @@ function supprimerIndice(nomRapport) {
     });
 }
 
+/**
+ * Permet de récupérer le rapport dont le nom est passé en paramètre
+ * @param {*} nomRapport Nom du rapport a récupérer
+ * @returns Résolue avec les données du rapport si la lecture a réussi, rejetée sinon
+ */
 function getRapport(nomRapport) {
     return new Promise((resolve, reject) => {
         fs.readFile(`${cheminRapports}${nomRapport}${extRapports}`, "utf8", (err, donnees) => {
@@ -197,6 +235,11 @@ function getRapport(nomRapport) {
     });
 }
 
+/**
+ * Sauvegarde ou met à jour le rapport passé en paramètre, ajoute son nom aux indices
+ * @param {Object} rapport 
+ * @returns Promesse résolue si le rapport a été sauvegardé, rejetée sinon
+ */
 function sauvegarderRapport(rapport) {
     return new Promise((resolve, reject) => {
         fs.writeFile(`${cheminRapports}${rapport.nom}${extRapports}`, JSON.stringify(rapport), (err) => {
@@ -234,6 +277,11 @@ function sauvegarderRapport(rapport) {
     });
 }
 
+/**
+ * Fonction permettant de dupliquer un rapport, fait une copie en changeant le nom du fichier, ajoute la copie aux indices
+ * @param {Object} rapport 
+ * @returns Promesse résolue si le rapport a été dupliqué, rejetée sinon
+ */
 function copierRapport(nomRapportSource, nomRapportCopie) {
     return new Promise((resolve, reject) => {
         getRapport(nomRapportSource).then((rapport) => {
@@ -251,6 +299,11 @@ function copierRapport(nomRapportSource, nomRapportCopie) {
     });
 }
 
+/**
+ * Fonction permettant de supprimer un rapport, supprime également son nom des indices
+ * @param {String} nomRapport 
+ * @returns Promesse résolue si le rapport a été supprimé, rejetée sinon
+ */
 function supprimerRapport(nomRapport) {
     return new Promise((resolve, reject) => {
         const chemin = `${cheminRapports}${nomRapport}${extRapports}`;
@@ -279,6 +332,10 @@ function supprimerRapport(nomRapport) {
     });
 }
 
+/**
+ * Lit les fichiers dans le dossiers destiné aux rapports pour les indexer
+ * @returns Promesse résolue si les rapports ont été indexés, rejetée sinon
+ */
 function indexerRapports() {
     return new Promise((resolve, reject) => {
         var indice = { rapports: [] };
@@ -315,6 +372,13 @@ function indexerRapports() {
     });
 }
 
+/**
+ * Permet de renommer un rapport, celà comprend le rennomage du fichier, le rennomage du titre du rapport et le
+ * rennomage du rapport dans les indices. Si le rennomage échoue, les modification sont annulées.
+ * @param {String} ancienTitre 
+ * @param {String} nouveauTitre 
+ * @returns Promesse résolue si le rennomage a réussi, rejetée sinon
+ */
 function modifierNomRapport(ancienTitre, nouveauTitre) {
     return new Promise((resolve, reject) => {
         const cheminAncienNom = `${cheminRapports}${ancienTitre}${extRapports}`;
@@ -356,6 +420,10 @@ function modifierNomRapport(ancienTitre, nouveauTitre) {
     });
 }
 
+/**
+ * Permet de récupérer un objet JSON contenant les données lues du fichier local
+ * @returns Promesse résolue si la lecture a réussi, rejetée sinon
+ */
 function getBibliotheque() {
     return new Promise((resolve, reject) => {
         fs.readFile(cheminBibliotheque, "utf8", (err, donnees) => {
@@ -368,6 +436,11 @@ function getBibliotheque() {
     });
 }
 
+/**
+ * Prend en paramètre un objet JSON contenant les données de la bibliothèque et le sauvegarde
+ * @param {Object} bibliotheque 
+ * @returns Promesse résolue si les données ont été bien sauvegardées, rejetée sinon
+ */
 function sauvegarderBibliotheque(bibliotheque) {
     return new Promise((resolve, reject) => {
         fs.writeFile(`${cheminBibliotheque}`, JSON.stringify(bibliotheque), (err) => {
@@ -388,6 +461,8 @@ indexerRapports();
 /**
  * Fonctions génération du document Word
  */
+
+//Objet contenant les propriétés des pages du document
 const proprietesPage = {
     page: {
         margin: {
@@ -399,10 +474,12 @@ const proprietesPage = {
     }
 };
 
+//Objet contenant les configuration du document docx.js
 const docFeatures = {
     updateFields: true
 };
 
+//Objet contenant les données pour générer le pied de la page de garde
 const piedPageGarde = {
     default: new docx.Footer({
         children: [
@@ -566,7 +643,7 @@ const piedPageGarde = {
     })
 };
 
-
+//Objet contenant les données pour générer la table de matières avec docx.js
 const sectionTableMatieres = {
     properties: proprietesPage,
     children: [
@@ -591,6 +668,7 @@ const sectionTableMatieres = {
     ]
 };
 
+//Objet contenant les configurations pour les liste numérotées
 const numbering = {
     config: [{
         reference: "BRP",
@@ -675,6 +753,7 @@ const numbering = {
     }]
 };
 
+//Objet contenant les conversions d'alignements des entêtes entre Quill.js et docx.js
 const headingLevels = [
     undefined,
     docx.HeadingLevel.HEADING_1,
@@ -683,6 +762,7 @@ const headingLevels = [
     docx.HeadingLevel.HEADING_4
 ]
 
+//Objet contenant les conversions d'espacement entre Quill.js et docx.js
 const indent = [
     undefined,
     { left: docx.convertMillimetersToTwip(4) },
@@ -691,6 +771,8 @@ const indent = [
     { left: docx.convertMillimetersToTwip(16) }
 ];
 
+
+//Objet contenant les conversions de couleur de soulignement entre Quill.js et docx.js
 const highlight = {
     '#ffff00': 'yellow',
     '#00ff00': 'green',
@@ -709,6 +791,7 @@ const highlight = {
     '#ffffff': "none"
 };
 
+//Objet contenant les conversions d'alignements entre Quill.js et docx.js
 const alignmentTypes = {
     justify: docx.AlignmentType.JUSTIFIED,
     center: docx.AlignmentType.CENTER,
@@ -716,6 +799,7 @@ const alignmentTypes = {
     left: docx.AlignmentType.LEFT
 }
 
+//Array contenant le paramétrage par défaut de l'éditeur de texte Quill
 const defaut = {
     font: "Arial",
     size: 20,
@@ -726,6 +810,14 @@ const defaut = {
     highlight: "none",
 }
 
+/**
+ * Fonction permettant de générer le contenu de la page de garde en utilisant les information passées en paramètre
+ * @param {String} nomProjet
+ * @param {String} version 
+ * @param {String} date 
+ * @param {String} nomLivrable 
+ * @returns Array d'objets de type Paragraphe compatibles avec docx.js permettant de générer la page de garde.
+ */
 function genererContenuPageGarde(nomProjet, version, date, nomLivrable) {
     return [
         new docx.Paragraph({
@@ -873,6 +965,12 @@ function genererContenuPageGarde(nomProjet, version, date, nomLivrable) {
     ];
 }
 
+/**
+ * Fonction utilisée pour générer les titres au bon format selon leur indice
+ * @param {Number} index Indice du titre
+ * @param {String} text Texte du titre
+ * @returns Objet compatible avec docx.js permettant d'insérer le titre dans le document.
+ */
 function genererHeadingText(index, text) {
     const fontSize = [0, 36, 28, 26, 24];
     const italic = [false, false, false, true, false];
@@ -885,6 +983,13 @@ function genererHeadingText(index, text) {
     });
 }
 
+/**
+ * Fonction utilisée pour générer le pied de page du document, en utilisant les inforamtions passées en paramètre
+ * @param {String} client 
+ * @param {String} nomProjet 
+ * @param {String} nomLivrable 
+ * @returns Objet compatible avec docx.js contenant le pied de page généré
+ */
 function genererPiedPage(client, nomProjet, nomLivrable) {
     return {
         default: new docx.Footer({
@@ -936,6 +1041,12 @@ function genererPiedPage(client, nomProjet, nomLivrable) {
     }
 }
 
+/**
+ * En utilisant les données au format Delta de Quill.js, crée des paragraphes compatibles avec docx.js.
+ * @param {Object} titre Object contenant les données associées à un titre du rapport
+ * @returns Array contenant des Objets de type Paragraphe, à l'aide de docx.js, ces objets seront utilisés pour
+ * générer le rapport sous format Word.
+ */
 function creerParagraphes(titre) {
     let paragraphes = [];
     if (titre.contenu) {
@@ -960,6 +1071,7 @@ function creerParagraphes(titre) {
 
         for (let ligne of texte.ops) {
             let creerParagraphe = false;
+
             if (ligne.attributes && ligne.attributes.align) {
                 contenuCourant.alignment = alignmentTypes[ligne.attributes.align];
                 creerParagraphe = true;
@@ -970,37 +1082,42 @@ function creerParagraphes(titre) {
                 creerParagraphe = true;
             }
 
-            if (ligne.insert) {
-                let parametresTextRun = {};
+            let parametresTextRun = {};
+            if (ligne.attributes) {
+                parametresTextRun.font = (ligne.attributes.font || defaut.police);
+                parametresTextRun.size = (ligne.attributes.size ? parseInt(ligne.attributes.size) * 2 : defaut.taille);
+                parametresTextRun.color = (ligne.attributes.color ? ligne.attributes.color : defaut.couleur);
+                parametresTextRun.highlight = (ligne.attributes.background ? highlight[ligne.attributes.background] : defaut.couleurSoulig);
+                parametresTextRun.bold = (ligne.attributes.bold ? true : defaut.gras);
+                parametresTextRun.italics = (ligne.attributes.italic ? true : defaut.italique);
+                parametresTextRun.underline = (ligne.attributes.souligne ? docx.UnderlineType.SINGLE : defaut.souligne);
+            } else parametresTextRun = defaut;
 
-                if (ligne.attributes) {
-                    parametresTextRun.font = (ligne.attributes.font || defaut.police);
-                    parametresTextRun.size = (ligne.attributes.size ? parseInt(ligne.attributes.size) * 2 : defaut.taille);
-                    parametresTextRun.color = (ligne.attributes.color ? ligne.attributes.color : defaut.couleur);
-                    parametresTextRun.highlight = (ligne.attributes.background ? highlight[ligne.attributes.background] : defaut.couleurSoulig);
-                    parametresTextRun.bold = (ligne.attributes.bold ? true : defaut.gras);
-                    parametresTextRun.italics = (ligne.attributes.italic ? true : defaut.italique);
-                    parametresTextRun.underline = (ligne.attributes.souligne ? docx.UnderlineType.SINGLE : defaut.souligne);
-                } else parametresTextRun = defaut;
-
-                var lignes = ligne.insert.split("\n");
-                for (var i = 0; i < lignes.length; i++) {
-                    if (lignes[i] == "") {
-                        if (contenuCourant.children.length > 0) {
-                            paragraphes.push(new docx.Paragraph(_.cloneDeep(contenuCourant)));
-                            contenuCourant = {children: [], indent: indent[index]};
-                            creerParagraphe = false;
-                        } else paragraphes.push(new docx.Paragraph({children: []}));
-                    } else {
-                        parametresTextRun.text = lignes[i];
-                        contenuCourant.children.push(new docx.TextRun(parametresTextRun));
-                    }
+            var lignes = compterSauts(ligne.insert);
+            for (var l of lignes) {
+                if (l.breaks > 0) {
+                    parametresTextRun.text = l.texte;
+                    contenuCourant.children.push(new docx.TextRun(parametresTextRun));
+                    paragraphes.push(new docx.Paragraph(_.cloneDeep(contenuCourant)));
+                    creerParagraphe = false;
+                    contenuCourant = {
+                        children: [],
+                        indent: indent[index]
+                    };
+                    for (var i = 0; i < l.breaks - 1; i++) paragraphes.push(new docx.Paragraph(""));
+                } else {
+                    parametresTextRun.text = l.texte;
+                    contenuCourant.children.push(new docx.TextRun(parametresTextRun));
                 }
             }
 
+            
             if (creerParagraphe) {
                 paragraphes.push(new docx.Paragraph(_.cloneDeep(contenuCourant)));
-                contenuCourant = {children: [], indent: indent[index]};
+                contenuCourant = {
+                    children: [],
+                    indent: indent[index]
+                };
             }
         }
 
@@ -1009,6 +1126,56 @@ function creerParagraphes(titre) {
     return paragraphes;
 }
 
+/**
+ * Prend en paramètre une chaîne de charactères et la dévéloppe en blocs par sauts de ligne
+ * @param {String} str String à dévélopper
+ * @returns Array contenant les lignes dévéloppés avec la quantité de sauts de ligne
+ */
+function compterSauts(str) {
+
+    if (!str.includes("\n")) {
+        return [{texte: str, breaks: 0}]
+    } else {
+        var strCompte = [];
+        var i = str.indexOf("\n");
+        var qnt = 0;
+        while (str[i] == "\n") {qnt++; i++;}
+        strCompte.push({
+            texte: str.substring(0, str.indexOf("\n")),
+            breaks: qnt
+        });
+        let dernierMot = i;
+        for (; i < str.length; i++) {
+            if (str[i] == "\n") {
+                qnt = 0;
+                let premier = i;
+                while (str[i] == "\n") {qnt++; i++;}
+                strCompte.push({
+                    texte: str.substring(dernierMot, premier),
+                    breaks: qnt
+                });
+                dernierMot = i;
+            }
+        }
+
+        if (str[str.length - 1] != "\n") {
+            strCompte.push({
+                texte: str.substring(dernierMot),
+                breaks: 0
+            });
+        }
+    }
+
+    return strCompte;
+}
+
+
+/**
+ * La fonction lit les données du rapport dont le nom est passé en paramètre et génère un document sous format
+ * Word.
+ * @param {String} nomRapport 
+ * @returns Promesse résolue si le document a été généré avec succès, rejetée sinon
+ */
 function genererWord(nomRapport) {
     return new Promise((resolve, reject) => {
         getRapport(nomRapport).then((rapport) => {

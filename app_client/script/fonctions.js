@@ -8,6 +8,12 @@
     if (cookie.length == 2) return cookie.pop().split(';').shift();
 }
 
+/**
+ * Cette fonction récupère l'indice des rapports du serveur et insère le html contenant les rapports chargés dans la page.
+ * La fonction s'occupe des événements de liés aux rapports (Ouvrir, Supprimer, Duppliquer, Sauvegarder et Générer Word)
+ * @param {String ?} rapportASelectionner Nom du rapport à séléctionner après le chargement. Optionnel.
+ * @returns Promesse résolue si les rapports ont bien été listés, rejetée sinon.
+ */
 function listerRapports(rapportASelectionner) {
     return new Promise((resolve, reject) => {
         chargerRapports().then((reponse) => {
@@ -26,10 +32,12 @@ function listerRapports(rapportASelectionner) {
                 `;
             }
 
+            //Insertion du code html contenant les rapports dans la page
             $("div.contenu-menu-rapports div.liste-rapports").html(listeRapportsHtml);
 
+            //Événement de clique bouton supprimer rapport
             $("div.liste-rapport-item svg.trash-icn").on("click", function (evt) {
-                evt.stopPropagation();
+                evt.stopPropagation(); //Empêche que le click déclenche aussi l'événement d'ouverture (svg dans le div)
                 $("div#supprimer-rapport-modal").css("display", "block");
                 $("span#supprimer-projet-modal-desc-nom-projet").html($(this).data("doc"));
                 $("button#supprimer-rapport-confirmer").off();
@@ -38,7 +46,7 @@ function listerRapports(rapportASelectionner) {
                     const btn = this;
                     $(btn).parent().hide();
                     $("div#supprimer-rapport-loader").removeClass("masque");
-                    supprimerRapport(rappASupprimer).then((valResolue) => {
+                    supprimerRapport(rappASupprimer).then(() => {
                         listerRapports();
                         $("div#supprimer-rapport-modal").fadeOut(200, () => {
                             $("div#supprimer-rapport-loader").addClass("masque");
@@ -50,8 +58,9 @@ function listerRapports(rapportASelectionner) {
                 });
             });
 
+            //Événement de clique boutons sauvegarder rapport
             $("div.liste-rapport-item svg.save-icn").on("click", function (evt) {
-                evt.stopPropagation();
+                evt.stopPropagation(); //Empêche que le click déclenche aussi l'événement d'ouverture (svg dans le div)
                 //Afficher roue de chargement et fond
                 const rapportItem = $(this).parent();
                 $(rapportItem).find("svg.save-icn").hide();
@@ -69,6 +78,7 @@ function listerRapports(rapportASelectionner) {
                 }); 
             });
 
+            //Événement de cliaue bouton générer Word
             $("div.liste-rapport-item svg.export-icn").on("click", function(evt) {
                 evt.stopPropagation();
                 const nomFichier = $(this).parent().data("rapp");
@@ -79,11 +89,15 @@ function listerRapports(rapportASelectionner) {
                 });
             });
 
+            //Événement de clique bouton dupliquer rapport
             $("div.liste-rapport-item svg.copy-icn").on("click", function(evt) {
                 evt.stopPropagation();
                 const nomRapportSource = $(this).parent().data("rapp");
 
+                //Affichage du modal pour saisir le nom du rapport copié
                 $("div#dupliquer-rapport-modal").css("display", "block");
+
+                //Événement champs de texte du modal, vérifie si le nom du rapport copié est valide
                 $("input#dupliquer-rapport-nom").on("keyup", function() {
                     const mauvaisCaracteres = /[\\/:"*?<>|.]+/;
                     const valeurCourante = $(this).val();
@@ -94,6 +108,7 @@ function listerRapports(rapportASelectionner) {
                     else if (valeurCourante != "") $("button#dupliquer-rapport-confirmer").removeAttr("disabled");
                 });
 
+                //Événement bouton confirmer duplication du modal
                 $("button#dupliquer-rapport-confirmer").on("click", function() {
                     $("div#dupliquer-rapport-modal-boutons").hide();
                     $("div#dupliquer-rapport-loader").show();
@@ -111,6 +126,7 @@ function listerRapports(rapportASelectionner) {
                 });
             });
 
+            //Événement de clique div contenant le rapport, ouverture du rapport
             $("div.liste-rapport-item").on("click", function (evt) {
                 if ($("div.titre").length > 0 && $("div.titre").not(".sauvegarde").length > 0) {
                     afficherModalSauvegarderModifications(this);
@@ -119,6 +135,7 @@ function listerRapports(rapportASelectionner) {
                 }
             });
 
+            //Si un rapport a été passé en paramètre, il est séléctionné 
             if (rapportASelectionner) $(`div.liste-rapport-item[data-rapp="${rapportASelectionner}"]`).trigger("click");
 
             resolve(reponse);
@@ -129,6 +146,10 @@ function listerRapports(rapportASelectionner) {
     });
 }
 
+/**
+ * Ouvre (séléctionne) le rapport
+ * @param {Object} rapport Rapport à séléctionner
+ */
 function selectionnerRapport(rapport) {
     $("div.liste-rapport-item.selectionne").removeClass("selectionne");
     $("div.titre").remove();
@@ -139,6 +160,11 @@ function selectionnerRapport(rapport) {
     $("svg.save-icn").not(btnSauvegarder).css("visibility", "hidden");
 }
 
+/**
+ * S'il existe des modification non sauvegardées dans le rapport, on affiche un modal pour demander à l'utilisateur
+ * s'il ne souhaite pas enregistrer ces modifications
+ * @param {Object} rapportClique 
+ */
 function afficherModalSauvegarderModifications(rapportClique) {
 
     //On supprime les anciens écouteurs por en ajouteur des nouveaux conecernant le titre cliqué
@@ -171,6 +197,11 @@ function afficherModalSauvegarderModifications(rapportClique) {
     $("div#sauvegarder-modifications-modal").css("display", "block");
 }
 
+/**
+ * Retourne l'indice du titre passé en paramètre
+ * @param {Object} titre 
+ * @returns 
+ */
 function getIndexTitre(titre) {
     if (titre.hasClass("titre-1")) return 1;
     else if (titre.hasClass("titre-2")) return 2;
@@ -179,6 +210,11 @@ function getIndexTitre(titre) {
     else return 0;
 }
 
+/**
+ * Convertit le numéro passé en paramètre en roumain, utilisé pour la numérotation des titres
+ * @param {Number} num 
+ * @returns Chaîne de caractères contenant le numéro converti
+ */
 function convertirEnRoumain(num) {
     var roumain = {
         M: 1000,
@@ -205,6 +241,9 @@ function convertirEnRoumain(num) {
     return str;
 }
 
+/**
+ * Numérote les chapitres du rapport selon la convention utilisée par BRP
+ */
 function numeroterChapitres() {
     let index1 = 1;
     $("div#editeur-rapport").find(".titre-1").each( function() {
@@ -236,6 +275,13 @@ function numeroterChapitres() {
     });
 }
 
+/**
+ * Création d'un nouveau titre en fournissant son indice et le titre source.
+ * Si le titre source n'est pas fourni on considère qu'il s'agit du premier titre ajouté
+ * @param {Number} index 
+ * @param {Object ?} titreSource 
+ * @returns Objet contenant le quill de l'éditeur de texte associé au titre ainsi que le titre
+ */
 function creerTitre(index, titreSource) {
 
     let dpdwContenuHtml = ``;
@@ -361,6 +407,10 @@ function creerTitre(index, titreSource) {
     };
 }
 
+/**
+ * Fonction permettant de sauvegarder le rapport séléctionné
+ * @returns Promesse résolue si le rapport a été sauvegardé, rejetée sinon
+ */
 function sauvegarderRapport() {
     return new Promise((resolve, reject) => {
         //Sauvegarder tous les titres qui ne le sont pas encore
@@ -449,6 +499,10 @@ function sauvegarderRapport() {
     });
 }
 
+/**
+ * Fonction permettant de générer le code html du rapport ouvert, à partir des données récupérées du serveur
+ * @param {String} nomRapport 
+ */
 function genererHtmlRapport(nomRapport) {
     $("div#menu-editeur-ouverture").css("display","flex");
     ouvrirRapport(nomRapport).then((rapport) => { 
@@ -536,6 +590,11 @@ function genererHtmlRapport(nomRapport) {
     });
 }
 
+/**
+ * Fonction permettant d'insérer le code html des articles de la bibliothèque passés en paramètre
+ * @param {} articles 
+ * @param {*} niveau 
+ */
 function insererHtmlArticle(articles, niveau) {
     
     for (let article of articles) {
@@ -571,6 +630,10 @@ function insererHtmlArticle(articles, niveau) {
     }
 }
 
+/**
+ * Récupère les données de la bibliothèque du serveur et génère le code html pour l'affichage
+ * @returns Promesse résolue si la bibliothèque a été chargée, rejetée sinon
+ */
 function genererHtmlBibliotheque() {
     return new Promise((resolve, reject) => {
         recupererBibliotheque().then((bibliotheque) => {
@@ -646,6 +709,11 @@ function genererHtmlBibliotheque() {
     });
 }
 
+/**
+ * Génère un array contenant les articles actuellement présents dans la bibliothèque pour les sauvegarder dans le serveur
+ * @param {Object} articles Balise html contenant la bibliothèque (Object JQuery)
+ * @returns 
+ */
 function sauvegarderArticles(articles) {
     var listeArticles = [];
 
@@ -668,6 +736,14 @@ function sauvegarderArticles(articles) {
     return listeArticles;
 }
 
+/**
+ * FOnction permettant de créer un article en donnant son parent (arborescence), son type, son titre et le contenu dans le cas des types articles
+ * @param {Object} parent 
+ * @param {String} type 
+ * @param {String} titre 
+ * @param {String ?} contenu 
+ * @returns Promesse résolue si l'article a été créé, rejetée sinon
+ */
 function creerArticle(parent, type, titre, contenu) {
     return new Promise((resolve, reject) => {
         $("div.ui-accordion").accordion("destroy");

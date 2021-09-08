@@ -1,3 +1,7 @@
+/**
+ * Ce fichier contient les fonction utilisées pour la communication avec le serveur
+ */
+
 const urlServeur = "http://brpetude2.ddns.net:8085";
 
 function chargerRapports() {
